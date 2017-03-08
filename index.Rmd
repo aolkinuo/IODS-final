@@ -5,5 +5,117 @@ date: "8 maaliskuuta 2017"
 email: "anna-liina.olkinuora@helsinki.fi"
 output: html_document
 ---
+#Abstract
+In this final assignment I try to find a suitable model for modelling alcohol usage. I also perform a principal component analysis on the data that includes alcohol usage and some backgound variables.
+  I find that absences have a positive and statistically significant effect on alcohol usage. Studying time affects alcohol consumption negatively and statistically significantly. Health, age, relationship status, guardian and internet usage don´t have statistically significant effects on alcohol consumption.
 
-I examine the effect of absences, health, family relationships, time used in studying, age, relationship status, guardian and internet usage on alcohol usage. My hypothesis is that 
+
+I examine the effect of absences, health, time used in studying, age, relationship status, guardian and internet usage on alcohol usage. My hypothesis is that absences and age affect positively and statistically significantly on alcohol usage. My another hypothesis is that health, time used in studying and being in a relationship affect negatively and statistically significantly on alcohol usage. I guess that guardian and internet usage have no significant effects on alcohol usage.
+
+You can see how I have wrangled data here: https://github.com/aolkinuo/IODS-final/blob/master/data/create_alc_final.R
+
+Data is from UCI Machine Learning Repository. It includes information about people´s alcohol consumption and many backgroud variables such as absences, health, time used in studying, age, relationship status, guardian and internet usage. The data was originally in two parts and I combined them using some of the variables. I removed the variables not used in combining from the data.
+  I removed all other variables but alcohol usage, absences, health, time used in studying, age, relationship status, guardian, internet usage and sex from the data. I renamed the variables with Finnish names. I removed the rows that had missing observations. I removed men from the data and removed the sex variable afterwords.
+  I made new numerical versions of the variables relationship status, guardian and internet usage and removed the characterical versions of the variables from the data. I renamed the numerical versions of relationship status, guardian and internet usage with the same names that their characterical versions had.
+  
+```{r}
+
+#Changing the working directory
+setwd("C:/Users/Anna-Liina/Documents/IODS-final")
+
+#Reading the data into the memory
+alc=read.table("data/alc.txt", sep = ",", header = TRUE)
+
+#Checking out the structure of the data
+str(alc)
+
+#Checking the dimension of the data
+dim(alc)
+
+#Drawing a plot with distributions of the variables and their #correlations
+library(ggplot2)
+
+library(GGally)
+
+p=ggpairs(alc, mapping = aes(alpha = 0.3), lower = list(combo = wrap("facethist", bins = 20)), title="Distributions and correlations")
+
+p
+
+cor(alc)
+
+```
+We see that all of the variables are numerical. Seven of the eight variables have integer values. There are eight variables, as mentioned, and there are 198 obserations.
+  From the picture we see that variable alcohol usage does not correlate very much with other variables. The highest correlations in absolute value it has with studying time, absences and internet usage. The previously mentioned correlations are -0.215, 0.161 and 0.105. 
+    The correlations between other variables than alcohol usage are also quite moderate. The highest correlations in absolute value are between variables absences and studying time, absences and relationship status, health and guardian, studying time and age, age and relationship status, age and guardian, age and internet usage and relationship status and internet usage. The previously mentioned correlations are -0.14, 0.118, -0.147, 0.115, 0.108, 0.168, -0.13 and 0.144. It is a good thing that correlations between other variables than alcohol usage are small. Then there won´t be a big multicollinearity problem in the regression analysis where other variables explain alcohol usage.
+  Most distributions of the variables seem non-normal. Only guardian variable has approximately normal distribution. All variables except alcohol usage and absences have several peaks in their distributions. Alcohol usage and absences are skewed to the right and internet usage is skewed to the left.
+  
+First I use ordinary least squares method to see if absences, health, time used in studying, age, relationship status, guardian and internet usage explain alcohol usage significantly. I also want to know how large part of the variation in alcohol usage is due to the variation in other variables. I check if the assumptions of the linear regression model hold. 
+
+```{r}
+m1=lm(alk_käyttö~., data=alc)
+
+summary(m1)
+
+```
+
+The stars and dots in the picture indicate the statistical significance of the explanatory variables. Behind the stars and dots is a statistical test where is tested whether the null hypothesis about whether the parameter that is related to the explanatory variable is zero can be rejected. 
+  The null hypothesis about whether the parameters related to the variables absences, studying time, guardian and internet usage are zero can be rejected with significance levels 0.1, 0.01, 0.1 and 0.1, respectively. That means that the parameters related to the variables absences, studying time, guardian and internet usage that is their effects on alcohol usage are significant. The null hypothesis about whether the parameters of the variables health, age and relationship status are zeros cannot be rejected. Their effects to alcohol usage are hence not significant. 
+  I next remove health, age and relationship status from the model due to their parameter estimates bad significance. I use ordinary least squares to estimate a new model without them.
+  
+```{r}
+m2=lm(alk_käyttö~poissaolot+opisk_aika+huoltaja+netti, data=alc)
+
+summary(m2)
+```
+
+Now I see that intercept and the parameters of the variables absences and atudying time arre statistically significant with significance levels 0.001, 0.1 and 0.01, respectively. Parameters of the variables guardian and internet usage are no more significant.
+  I also see that when absences raises by one, alcohol usage raises by 0.015. When studying time raises by one, alcohol usage decreases by 0.191. When all the explanatory variables are zero, alcohol usage has the value 1.901. 
+  Studying time, guardian and internet usage are cathegorical variables and they have comparable groups that are included in the intercept. For example guardian being a father and no internet connection are in the intercept. The parameter value of guardian means that guardian being a mother decreases alcohol usage by 0.167. Parameter value of internet usage means that having an internet raises alcohol usage by 0.212.
+  Multiple R-squared and adjusted R-squared are coefficients of determination of the model. Coefficient of determination tells how much the model that is the explanatory variables explain of the variation in the dependent variable and it gets values between zero and one that is zero and hundred in per cents. In this model absences, studying time, guardian and internet usage explain 8.7 per cents of the variation in alcohol usage. Hence the model is not performing very well.
+  Adjusted R-squared gets always a value smaller than multiple R-squared because it takes the amount of explanatory variables into account. It is more accurate meter of the performance of the model than multiple R-squared. Adding a new variable into a model is likely to increase multiple R-squared and lower adjusted R-squared.
+In this model the adjusted R-squared is 6.8 per cents.
+  From the results of the regression analysis I notice that my hypothesis was partly wrong. I was right when I guessed that absences have statistically significant and positive effect on alcohol usage. I was also right guessing that studying time has a significant and negative effect on alcohol usage and that the effects of guardian and internet usage are not significant. I didn´t know that the effects of health, age and relationship status have non-significant effects on alcohol usage.
+```{r}
+
+par(mfrow = c(2,2))
+plot(m2, which = c(1,2,5))
+
+```
+
+I have drawn three pictures. First one has fitted values on the x-axis and residuals on the the y-axis. QQ-plot picture has the teorethical quantiles on the x-axis and standardized residuals on the y-axis. Third one has leverage on the x-axis and standardized residuals on the y-axis. 
+  From the first picture I can reason whether the model residuals have a variance that is constant. As the observations have consentrated in the middle part of the picture and the so called zero line, are they form a pattern might be that the residuals have non-constant variance. That means that the level of the residuals might depend on the levels of the explanatory variables. Constant variance of the residuals is one assumption often made when estimating a linear regression model. Seems that now it doesn´t hold.
+  From the QQ-plot picture I can reason whether the residuals are normal. As the observations are located on the top of the line I can make a conclusion that the residuals are approximately normally distributed. That is another assumption that is usually made when linear regression model is estimated and now it seems to hold.
+  From the third picture I can make conclusions about the level of the leverage. The leverage measures the effect that one observation has for the model. A scatterplot with the residuals and the leverage helps to notice the observations that have exceptionally much effect for the model. From the picture I can see that the observation that has the largest value of leverage or Cook´s distance gets the valus 0.2. As it is quite small I can reason that the level of the leverage in the model is ordinary or small.
+  Other assumptions but the constant variance and normality of the residuals made when estimating a linear regression model are that the residuals don´t correlate and that they don´t depend on the independent variables.
+
+```{r}
+#Performing the principal component analysis (with the SVD method)
+pca_alc <- prcomp(alc)
+
+# create and print out a summary of pca_human
+s <- summary(pca_alc)
+s
+
+# rounded percentages of variance captured by each PC
+pca_pr <- round(100*s$importance[2,], digits = 1) 
+
+# print out the percentages of variance
+pca_pr
+
+# create object pc_lab to be used as axis labels
+pc_lab <- paste0(names(pca_pr), " (", pca_pr, "%)")
+
+# draw a biplot
+biplot(pca_alc, cex = c(0.8, 1), col = c("grey40", "deeppink2"), xlab = pc_lab[1], ylab = pc_lab[2], sub="Absences contribute to PC1 and health to PC2")
+
+
+```
+I performed a principal component analysis on the data. From a biplot of the two first principal components we see that health and absences don´t correlate a lot as the angle between the arrows representing them is large. Absences contribute to the first principal component as the arrow repserenting absences is pointing at the same direction as x-axis. Health contributes to the second principal component as the arrow representing is in line with the y-axis. The lenght of the arrows describes the stardard deviation of the variables or features.
+
+#Conclusion
+In this final assingment I examined the effect of absences, health, time used in studying, age, relationship status, guardian and internet usage on alcohol usage through ordinary least squares regression analysis. I also performed a principal component analysis on the data that contains the previously mentioned variables.
+  I found that only variables affecting statistically significantly on variation in alcohol usage were absences and studying time. Absences had a positive and studying time a negative effect on alcohol usage. The model that had absences, studying time, guardian and internet usage as independent variables was not perfect as the coefficient of determination was low and the errors seems to have a non-constant variance. The good side of he model was that the errors seemed to be normal and the leverage was moderate.
+  In principal component analysis I found that the correlation between absences and health was low. I also found that absences contributed a lot to the first principal component. Health contributed a lot to the second principal component.
+  A further examination this data could include performing a multiple correspondence analysis and linear discriminant analysis. Also a better model for describing the variation in alcohol consumption could be found.
+
+  
