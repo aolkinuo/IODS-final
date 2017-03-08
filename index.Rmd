@@ -9,9 +9,10 @@ output: html_document
 In this final assignment I try to find a suitable model for modelling alcohol usage. I also perform a principal component analysis on the data that includes alcohol usage and some backgound variables.
   I find that absences have a positive and statistically significant effect on alcohol usage. Studying time affects alcohol consumption negatively and statistically significantly. Health, age, relationship status, guardian and internet usage don´t have statistically significant effects on alcohol consumption.
 
-
+#Reasearch question
 I examine the effect of absences, health, time used in studying, age, relationship status, guardian and internet usage on alcohol usage. My hypothesis is that absences and age affect positively and statistically significantly on alcohol usage. My another hypothesis is that health, time used in studying and being in a relationship affect negatively and statistically significantly on alcohol usage. I guess that guardian and internet usage have no significant effects on alcohol usage.
 
+#Data
 You can see how I have wrangled data here: https://github.com/aolkinuo/IODS-final/blob/master/data/create_alc_final.R
 
 Data is from UCI Machine Learning Repository. It includes information about people´s alcohol consumption and many backgroud variables such as absences, health, time used in studying, age, relationship status, guardian and internet usage. The data was originally in two parts and I combined them using some of the variables. I removed the variables not used in combining from the data.
@@ -49,7 +50,8 @@ We see that all of the variables are numerical. Seven of the eight variables hav
     The correlations between other variables than alcohol usage are also quite moderate. The highest correlations in absolute value are between variables absences and studying time, absences and relationship status, health and guardian, studying time and age, age and relationship status, age and guardian, age and internet usage and relationship status and internet usage. The previously mentioned correlations are -0.14, 0.118, -0.147, 0.115, 0.108, 0.168, -0.13 and 0.144. It is a good thing that correlations between other variables than alcohol usage are small. Then there won´t be a big multicollinearity problem in the regression analysis where other variables explain alcohol usage.
   Most distributions of the variables seem non-normal. Only guardian variable has approximately normal distribution. All variables except alcohol usage and absences have several peaks in their distributions. Alcohol usage and absences are skewed to the right and internet usage is skewed to the left.
   
-First I use ordinary least squares method to see if absences, health, time used in studying, age, relationship status, guardian and internet usage explain alcohol usage significantly. I also want to know how large part of the variation in alcohol usage is due to the variation in other variables. I check if the assumptions of the linear regression model hold. 
+#Analysis
+First I use ordinary least squares method to see if absences, health, time used in studying, age, relationship status, guardian and internet usage explain alcohol usage significantly. I also want to know how large part of the variation in alcohol usage is due to the variation in other variables. I check if the assumptions of the linear regression model hold. Then I perform a principal component analysis on the data.
 
 ```{r}
 m1=lm(alk_käyttö~., data=alc)

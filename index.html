@@ -126,7 +126,13 @@ $(document).ready(function () {
 <div id="abstract" class="section level1">
 <h1>Abstract</h1>
 <p>In this final assignment I try to find a suitable model for modelling alcohol usage. I also perform a principal component analysis on the data that includes alcohol usage and some backgound variables. I find that absences have a positive and statistically significant effect on alcohol usage. Studying time affects alcohol consumption negatively and statistically significantly. Health, age, relationship status, guardian and internet usage don´t have statistically significant effects on alcohol consumption.</p>
+</div>
+<div id="reasearch-question" class="section level1">
+<h1>Reasearch question</h1>
 <p>I examine the effect of absences, health, time used in studying, age, relationship status, guardian and internet usage on alcohol usage. My hypothesis is that absences and age affect positively and statistically significantly on alcohol usage. My another hypothesis is that health, time used in studying and being in a relationship affect negatively and statistically significantly on alcohol usage. I guess that guardian and internet usage have no significant effects on alcohol usage.</p>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
 <p>You can see how I have wrangled data here: <a href="https://github.com/aolkinuo/IODS-final/blob/master/data/create_alc_final.R" class="uri">https://github.com/aolkinuo/IODS-final/blob/master/data/create_alc_final.R</a></p>
 <p>Data is from UCI Machine Learning Repository. It includes information about people´s alcohol consumption and many backgroud variables such as absences, health, time used in studying, age, relationship status, guardian and internet usage. The data was originally in two parts and I combined them using some of the variables. I removed the variables not used in combining from the data. I removed all other variables but alcohol usage, absences, health, time used in studying, age, relationship status, guardian, internet usage and sex from the data. I renamed the variables with Finnish names. I removed the rows that had missing observations. I removed men from the data and removed the sex variable afterwords. I made new numerical versions of the variables relationship status, guardian and internet usage and removed the characterical versions of the variables from the data. I renamed the numerical versions of relationship status, guardian and internet usage with the same names that their characterical versions had.</p>
 <pre class="r"><code>#Changing the working directory
@@ -178,7 +184,10 @@ p</code></pre>
 ## huoltaja   -0.02527798  1.00000000  0.02714283
 ## netti       0.14440032  0.02714283  1.00000000</code></pre>
 <p>We see that all of the variables are numerical. Seven of the eight variables have integer values. There are eight variables, as mentioned, and there are 198 obserations. From the picture we see that variable alcohol usage does not correlate very much with other variables. The highest correlations in absolute value it has with studying time, absences and internet usage. The previously mentioned correlations are -0.215, 0.161 and 0.105. The correlations between other variables than alcohol usage are also quite moderate. The highest correlations in absolute value are between variables absences and studying time, absences and relationship status, health and guardian, studying time and age, age and relationship status, age and guardian, age and internet usage and relationship status and internet usage. The previously mentioned correlations are -0.14, 0.118, -0.147, 0.115, 0.108, 0.168, -0.13 and 0.144. It is a good thing that correlations between other variables than alcohol usage are small. Then there won´t be a big multicollinearity problem in the regression analysis where other variables explain alcohol usage. Most distributions of the variables seem non-normal. Only guardian variable has approximately normal distribution. All variables except alcohol usage and absences have several peaks in their distributions. Alcohol usage and absences are skewed to the right and internet usage is skewed to the left.</p>
-<p>First I use ordinary least squares method to see if absences, health, time used in studying, age, relationship status, guardian and internet usage explain alcohol usage significantly. I also want to know how large part of the variation in alcohol usage is due to the variation in other variables. I check if the assumptions of the linear regression model hold.</p>
+</div>
+<div id="analysis" class="section level1">
+<h1>Analysis</h1>
+<p>First I use ordinary least squares method to see if absences, health, time used in studying, age, relationship status, guardian and internet usage explain alcohol usage significantly. I also want to know how large part of the variation in alcohol usage is due to the variation in other variables. I check if the assumptions of the linear regression model hold. Then I perform a principal component analysis on the data.</p>
 <pre class="r"><code>m1=lm(alk_käyttö~., data=alc)
 
 summary(m1)</code></pre>
